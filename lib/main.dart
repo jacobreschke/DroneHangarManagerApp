@@ -43,6 +43,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Hangar Manager'),
         backgroundColor: Colors.blue,
+
       ),
       body: pages[selectedIndex],
       bottomNavigationBar: NavigationBar(

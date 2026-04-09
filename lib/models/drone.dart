@@ -1,85 +1,50 @@
 enum Status { available, flying, charging, maintenance }
 
 abstract class Drone {
-  String _name;
-  final int _id;
-  final int _year;
-  final String _type;
-  final String _manufacturer;
-  final String _model;
-  Status _status = Status.available;
-  int _battery = 100;
-  double _totalFlightHours = 0.0;
+  String name;
+  final int id;
+  final int year;
+  final String type;
+  final String manufacturer;
+  final String model;
+  Status status = Status.available;
+  int battery = 100;
+  double totalFlightHours = 0.0;
 
   Drone(
-    this._name,
-    this._id,
-    this._type,
-    this._year,
-    this._manufacturer,
-    this._model,
+    this.name,
+    this.id,
+    this.type,
+    this.year,
+    this.manufacturer,
+    this.model,
   );
 
   @override
   String toString() {
-    return '$_name $_manufacturer $_model ($_year) - $_status';
+    return '$name $manufacturer $model $year - $status';
   }
 
-  String getName() {
-    return _name;
-  }
-
-  int getId() {
-    return _id;
-  }
-
-  int getYear() {
-    return _year;
-  }
-
-  String getType() {
-    return _type;
-  }
-
-  String getManufacturer() {
-    return _manufacturer;
-  }
-
-  String getModel() {
-    return _model;
-  }
-
-  Status getStatus() {
-    return _status;
-  }
-
-  int getBattery() {
-    return _battery;
-  }
-
-  double getTotalFlightHours() {
-    return _totalFlightHours;
-  }
 }
 
 class StandardDrone extends Drone {
   StandardDrone(
-    super._name,
-    super._id,
-    super._type,
-    super._year,
-    super._manufacturer,
-    super._model,
+    super.name,
+    super.id,
+    super.type,
+    super.year,
+    super.manufacturer,
+    super.model,
   );
 }
 
 class PriorityDrone extends Drone {
   PriorityDrone(
-    super._name,
-    super._id,
-    super._type,
-    super._year,
-    super._manufacturer,
-    super._model,
+    super.name,
+    super.id,
+    super.type,
+    super.year,
+    super.manufacturer,
+    super.model,
   );
 }
