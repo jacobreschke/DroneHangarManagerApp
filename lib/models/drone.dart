@@ -1,9 +1,4 @@
-enum Status {
-  available,
-  flying,
-  charging,
-  maintenance
-}
+enum Status { available, flying, charging, maintenance }
 
 abstract class Drone {
   int id;
@@ -15,28 +10,30 @@ abstract class Drone {
   double battery = 100.0;
   double totalFlightHours = 0.0;
 
-  Drone(this.id, this.year, this.type, this.manufacturer, this.model);
+  Drone(this.id, this.type, this.year, this.manufacturer, this.model);
 
+  @override
+  String toString() {
+    return '$manufacturer $model ($year) - $status';
+  }
 }
 
 class StandardDrone extends Drone {
   StandardDrone(
-      super.id,
-      super.year,
-      super.type,
-      super.manufacturer,
-      super.model
-      );
-
+    super.id,
+    super.type,
+    super.year,
+    super.manufacturer,
+    super.model,
+  );
 }
 
 class PriorityDrone extends Drone {
   PriorityDrone(
-      super.id,
-      super.year,
-      super.type,
-      super.manufacturer,
-      super.model
-      );
-
+    super.id,
+    super.year,
+    super.type,
+    super.manufacturer,
+    super.model,
+  );
 }
