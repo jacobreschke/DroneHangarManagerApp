@@ -5,12 +5,12 @@ import '../models/drone.dart';
 
 
 
-Drone drone1 = new StandardDrone(1, "Standard", 2026, "DJI", "Mini");
-Drone drone2 = new PriorityDrone(2, "Standard", 2026, "DJI", "Pro");
-Drone drone3 = new PriorityDrone(2, "Standard", 2026, "DJI", "Pro");
-Drone drone4 = new PriorityDrone(2, "Standard", 2026, "DJI", "Pro");
-Drone drone5 = new PriorityDrone(2, "Standard", 2026, "DJI", "Pro");
-Drone drone6 = new PriorityDrone(2, "Standard", 2026, "DJI", "Pro");
+Drone drone1 = StandardDrone("Drone1", 1, "Standard", 2026, "DJI", "Mini");
+Drone drone2 = PriorityDrone("Drone2",2, "Standard", 2026, "DJI", "Pro");
+Drone drone3 = StandardDrone("Drone3",3, "Standard", 2026, "DJI", "Pro");
+Drone drone4 = PriorityDrone("Drone4",4, "Standard", 2026, "DJI", "Pro");
+Drone drone5 = StandardDrone("Drone5",5, "Standard", 2026, "DJI", "Pro");
+Drone drone6 = PriorityDrone("Drone6",6, "Standard", 2026, "DJI", "Pro");
 
 var drones = [drone1, drone2, drone3, drone4, drone5, drone6];
 
@@ -42,8 +42,22 @@ class _DronesScreenState extends State<DronesScreen> {
             itemBuilder: (BuildContext context, int index) {
               final drone = drones[index];
 
-              return ListTile(
-                title: Text(drone.toString()),
+              return Card(
+                elevation: 2,
+                margin: EdgeInsets.symmetric(vertical: 4),
+                  child: ListTile(
+                    leading: Image.asset('assets/images/drone.png'),
+                    isThreeLine: true,
+                    title: Text(drone.getName()),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${drone.getManufacturer()} ${drone.getModel()}'),
+                        Text("Bay 1"),
+                      ],
+                    ),
+                    trailing: Text('${drone.getBattery()}%'),
+                  ),
               );
             },
 
