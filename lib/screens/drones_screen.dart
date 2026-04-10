@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 
 import '../models/drone.dart';
 
+enum DronesScreenState {
+  viewDrones,
+  addDrone,
+  editDrone,
+}
+
 var drone1 = StandardDrone("Drone1", 1, "Standard", 2026, "DJI", "Mini");
 Drone drone2 = PriorityDrone("Drone2", 2, "Standard", 2026, "DJI", "Pro");
 Drone drone3 = StandardDrone("Drone3", 3, "Standard", 2026, "DJI", "Pro");
@@ -12,7 +18,6 @@ Drone drone6 = PriorityDrone("Drone6", 6, "Standard", 2026, "DJI", "Pro");
 
 var drones = [drone1, drone2, drone3, drone4, drone5, drone6];
 List<Drone> filteredDrones = drones;
-
 
 class DronesScreen extends StatefulWidget {
   const DronesScreen({super.key});
@@ -24,11 +29,10 @@ class DronesScreen extends StatefulWidget {
 class _DronesScreenState extends State<DronesScreen> {
   int _value = 0;
   var filterList = ["All", "Ready", "Flying", "Charge", "Maint."];
-
+  DronesScreenState screenState = DronesScreenState.viewDrones;
 
   @override
   Widget build(BuildContext context) {
-
     drones[0].status = Status.available;
     drones[1].status = Status.flying;
     drones[2].status = Status.charging;
@@ -39,13 +43,33 @@ class _DronesScreenState extends State<DronesScreen> {
         .of(context)
         .textTheme;
 
-    return Column(
-      children: [
-        buildTitleWithAddButton(context),
-        buildFilterDronesBar(),
-        buildDronesCardViewer(),
-      ],
-    );
+    return decideScreenState(screenState);
+  }
+
+  Widget decideScreenState(DronesScreenState screenState) {
+    switch (screenState) {
+      case DronesScreenState.viewDrones:
+        return Column(
+            children: [
+              buildTitleWithAddButton(context),
+              buildFilterDronesBar(),
+              buildDronesCardViewer(),
+            ]
+        );
+      case DronesScreenState.addDrone:
+        return Column(
+          children: [
+            Text('Add Drone Page'),
+          ],
+        );
+
+      case DronesScreenState.editDrone:
+        return Column(
+          children: [
+
+          ],
+        );
+    }
   }
 
   Expanded buildDronesCardViewer() {
@@ -61,18 +85,39 @@ class _DronesScreenState extends State<DronesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AspectRatio(
-                  aspectRatio: 16 / 6,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(8),
+                Stack(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 16 / 6,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(8),
+                        ),
+                        child: Image.asset(
+                          'assets/images/drone.png',
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                    child: Image.asset(
-                      'assets/images/drone.png',
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Badge(
+                        label: Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: Text(decideStatusText(drone)),
+                        ),
+                        textStyle: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        backgroundColor: decideStatusColor(drone)?.withOpacity(
+                            .3),
+                        textColor: decideStatusColor(drone),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -119,21 +164,24 @@ class _DronesScreenState extends State<DronesScreen> {
                       });
                     },
                     child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 18,
-                            vertical: 6),
-                        decoration: BoxDecoration(
-                          color: _value == index ? Colors.white : Colors
-                              .transparent,
-                          borderRadius: BorderRadius.circular(16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _value == index
+                            ? Colors.white
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        filterList[index],
+                        style: TextStyle(
+                          fontWeight: _value == index
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
-                        child: Text(
-                            filterList[index],
-                            style: TextStyle(
-                              fontWeight: _value == index
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            )
-                        )
+                      ),
                     ),
                   ),
                 );
@@ -160,7 +208,10 @@ class _DronesScreenState extends State<DronesScreen> {
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton.icon(
             onPressed: () {
-              addDrone(context);
+              setState(() {
+              screenState = DronesScreenState.addDrone;
+
+              });
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
@@ -212,9 +263,44 @@ class _DronesScreenState extends State<DronesScreen> {
     }
   }
 
-  void addDrone(BuildContext context) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Add drone pressed")));
+  Color? decideStatusColor(Drone drone) {
+    if (drone.status == Status.available) {
+      return Colors.green;
+    } else if (drone.status == Status.charging) {
+      return Colors.orange;
+    } else if (drone.status == Status.flying) {
+      return Colors.blue;
+    } else if (drone.status == Status.maintenance) {
+      return Colors.red;
+    }
+    return Colors.green;
   }
+
+  String decideStatusText(Drone drone) {
+    if (drone.status == Status.available) {
+      return 'available';
+    } else if (drone.status == Status.charging) {
+      return 'charging';
+    } else if (drone.status == Status.flying) {
+      return 'flying';
+    } else if (drone.status == Status.maintenance) {
+      return 'maintenance';
+    }
+    return 'No Status';
+  }
+
+
+}
+
+
+class AddDronePage extends StatelessWidget {
+  const AddDronePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+
+    );
+  }
+
 }
