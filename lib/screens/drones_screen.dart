@@ -40,7 +40,6 @@ class _DronesScreenState extends State<DronesScreen> {
   }
 
   Widget decideScreenState() {
-
     switch (screenState) {
       case DronesScreenState.viewDrones:
         return Column(
@@ -52,18 +51,21 @@ class _DronesScreenState extends State<DronesScreen> {
         );
       case DronesScreenState.addDrone:
         return AddDronePage(
-         onBack: () {
-
-           setState(() {
-             screenState = DronesScreenState.viewDrones;
-
-           });
-         }
-
+          onBack: () {
+            setState(() {
+              screenState = DronesScreenState.viewDrones;
+            });
+          },
         );
 
       case DronesScreenState.editDrone:
-        return Column(children: []);
+        return EditDronePage(
+          onBack: () {
+            setState(() {
+              screenState = DronesScreenState.viewDrones;
+            });
+          },
+        );
     }
   }
 
@@ -74,9 +76,27 @@ class _DronesScreenState extends State<DronesScreen> {
         itemCount: filteredDrones.length,
         itemBuilder: (BuildContext context, int index) {
           final drone = filteredDrones[index];
-          return Card(
-            elevation: 2,
-            margin: const EdgeInsets.symmetric(vertical: 1),
+          return displayDroneCard(drone);
+        },
+      ),
+    );
+  }
+
+  Card displayDroneCard(Drone drone) {
+    return Card(
+          elevation: 2,
+
+          margin: const EdgeInsets.symmetric(vertical: 1),
+          child: InkWell(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(8),
+              top: Radius.circular(8),
+            ),
+            onTap: () {
+              setState(() {
+                screenState = DronesScreenState.editDrone;
+              });
+            },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -86,7 +106,8 @@ class _DronesScreenState extends State<DronesScreen> {
                       aspectRatio: 16 / 6,
                       child: ClipRRect(
                         borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(8),
+                          bottom: Radius.circular(20),
+                          top: Radius.circular(20),
                         ),
                         child: Image.asset(
                           'assets/images/drone.png',
@@ -128,10 +149,8 @@ class _DronesScreenState extends State<DronesScreen> {
                 ),
               ],
             ),
-          );
-        },
-      ),
-    );
+          ),
+        );
   }
 
   Column buildFilterDronesBar() {
@@ -205,9 +224,7 @@ class _DronesScreenState extends State<DronesScreen> {
           child: ElevatedButton.icon(
             onPressed: () {
               setState(() {
-
                 screenState = DronesScreenState.addDrone;
-
               });
             },
             style: ElevatedButton.styleFrom(
@@ -285,15 +302,10 @@ class _DronesScreenState extends State<DronesScreen> {
     }
     return 'No Status';
   }
-
 }
 
-
 class AddDronePage extends StatelessWidget {
-  const AddDronePage({
-    super.key,
-    required this.onBack
-  });
+  const AddDronePage({super.key, required this.onBack});
 
   final VoidCallback onBack;
 
@@ -306,11 +318,41 @@ class AddDronePage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(8),
               child: IconButton(
-                  onPressed: () {
-                    onBack();
-                  },
-                  icon: Icon(Icons.arrow_back)),
+                onPressed: () {
+                  onBack();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
             ),
+            Text('Add Drone'),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class EditDronePage extends StatelessWidget {
+  const EditDronePage({super.key, required this.onBack});
+
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: IconButton(
+                onPressed: () {
+                  onBack();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            ),
+            Text('Edit Drone'),
           ],
         ),
       ],
