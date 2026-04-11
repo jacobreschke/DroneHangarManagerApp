@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Hangar Manager'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.blue.shade700,
         elevation: 2.0,
         shadowColor: Colors.black,
       ),

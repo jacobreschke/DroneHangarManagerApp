@@ -1,19 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../AppData.dart';
 import '../models/drone.dart';
 
 enum DronesScreenState { viewDrones, addDrone, editDrone }
 
-var drone1 = StandardDrone("Drone1", 1, "Standard", 2026, "DJI", "Mini");
-Drone drone2 = PriorityDrone("Drone2", 2, "Standard", 2026, "DJI", "Pro");
-Drone drone3 = StandardDrone("Drone3", 3, "Standard", 2026, "DJI", "Pro");
-Drone drone4 = PriorityDrone("Drone4", 4, "Standard", 2026, "DJI", "Pro");
-Drone drone5 = StandardDrone("Drone5", 5, "Standard", 2026, "DJI", "Pro");
-Drone drone6 = PriorityDrone("Drone6", 6, "Standard", 2026, "DJI", "Pro");
+AppData appData = new AppData();
 
-var drones = [drone1, drone2, drone3, drone4, drone5, drone6];
-List<Drone> filteredDrones = drones;
+List<Drone> filteredDrones = appData.drones;
 
 class DronesScreen extends StatefulWidget {
   const DronesScreen({super.key});
@@ -29,10 +24,10 @@ class _DronesScreenState extends State<DronesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    drones[0].status = Status.available;
-    drones[1].status = Status.flying;
-    drones[2].status = Status.charging;
-    drones[3].status = Status.maintenance;
+    appData.drones[0].status = Status.available;
+    appData.drones[1].status = Status.flying;
+    appData.drones[2].status = Status.charging;
+    appData.drones[3].status = Status.maintenance;
 
     final TextTheme textTheme = Theme.of(context).textTheme;
 
@@ -84,123 +79,124 @@ class _DronesScreenState extends State<DronesScreen> {
 
   Card displayDroneCard(Drone drone) {
     return Card(
-          elevation: 2,
+      elevation: 2,
 
-          margin: const EdgeInsets.symmetric(vertical: 1),
-          child: InkWell(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(8),
-              top: Radius.circular(8),
-            ),
-            onTap: () {
-              setState(() {
-                screenState = DronesScreenState.editDrone;
-              });
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      margin: const EdgeInsets.symmetric(vertical: 1),
+      child: InkWell(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(8),
+          top: Radius.circular(8),
+        ),
+        onTap: () {
+          setState(() {
+            screenState = DronesScreenState.editDrone;
+          });
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Stack(
-                  children: [
-                    AspectRatio(
-                      aspectRatio: 16 / 6,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.vertical(
-                          bottom: Radius.circular(20),
-                          top: Radius.circular(20),
-                        ),
-                        child: Image.asset(
-                          'assets/images/drone.png',
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                AspectRatio(
+                  aspectRatio: 16 / 6,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(20),
+                      top: Radius.circular(20),
                     ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Badge(
-                        label: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: Text(decideStatusText(drone)),
-                        ),
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        backgroundColor: decideStatusColor(
-                          drone,
-                        )?.withOpacity(.3),
-                        textColor: decideStatusColor(drone),
-                      ),
+                    child: Image.asset(
+                      'assets/images/drone.png',
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
-                  ],
+                  ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(drone.name),
-                      Text('${drone.manufacturer} ${drone.model}'),
-                      Text('Bay 1'),
-                    ],
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Badge(
+                    label: Padding(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(decideStatusText(drone)),
+                    ),
+                    textStyle: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    backgroundColor: decideStatusColor(drone)?.withOpacity(.3),
+                    textColor: decideStatusColor(drone),
                   ),
                 ),
               ],
             ),
-          ),
-        );
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(drone.name),
+                  Text('${drone.manufacturer} ${drone.model}'),
+                  Text('Bay 1'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Column buildFilterDronesBar() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.5, vertical: 6),
           child: Container(
-            padding: EdgeInsets.all(4),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
-              children: List<Widget>.generate(filterList.length, (int index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () {
-                      setState(() {
-                        _value = index;
-                        filteredDrones = filterDrones(_value);
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _value == index
-                            ? Colors.white
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        filterList[index],
-                        style: TextStyle(
-                          fontWeight: _value == index
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+              children: List.generate(filterList.length, (int index) {
+                final isSelected = _value == index;
+
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        setState(() {
+                          _value = index;
+                          filteredDrones = filterDrones(_value);
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.white : Colors.transparent,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          filterList[index], // 👈 FIXED POSITION
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
                         ),
                       ),
                     ),
                   ),
                 );
-              }).toList(),
+              }),
             ),
           ),
         ),
@@ -243,37 +239,37 @@ class _DronesScreenState extends State<DronesScreen> {
     List<Drone> filtered = [];
     switch (value) {
       case 0:
-        return drones;
+        return appData.drones;
       case 1:
-        for (Drone drone in drones) {
+        for (Drone drone in appData.drones) {
           if (drone.status == Status.available) {
             filtered.add(drone);
           }
         }
         return filtered;
       case 2:
-        for (Drone drone in drones) {
+        for (Drone drone in appData.drones) {
           if (drone.status == Status.flying) {
             filtered.add(drone);
           }
         }
         return filtered;
       case 3:
-        for (Drone drone in drones) {
+        for (Drone drone in appData.drones) {
           if (drone.status == Status.charging) {
             filtered.add(drone);
           }
         }
         return filtered;
       case 4:
-        for (Drone drone in drones) {
+        for (Drone drone in appData.drones) {
           if (drone.status == Status.maintenance) {
             filtered.add(drone);
           }
         }
         return filtered;
       default:
-        return drones;
+        return appData.drones;
     }
   }
 
