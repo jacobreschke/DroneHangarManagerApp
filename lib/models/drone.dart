@@ -7,6 +7,7 @@ abstract class Drone {
   final String type;
   final String manufacturer;
   final String model;
+  int currentBay = 0;
   Status status = Status.available;
   int battery = 100;
   double totalFlightHours = 0.0;
@@ -19,6 +20,8 @@ abstract class Drone {
     this.manufacturer,
     this.model,
   );
+
+
 
   @override
   String toString() {

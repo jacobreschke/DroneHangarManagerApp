@@ -5,7 +5,7 @@ import '../AppData.dart';
 import '../models/drone.dart';
 import '../models/hangar.dart';
 
-AppData appData = AppData();
+final AppData appData = AppData();
 
 class HangarScreen extends StatelessWidget {
   const HangarScreen({super.key});
@@ -14,8 +14,6 @@ class HangarScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    // DELETE AFTER ADDING POPULATE LOGIC
-    appData.populateBay();
 
     final occupiedBays = appData.hangar.bays
         .where((bay) => bay.assignedDrone != null)
@@ -36,13 +34,13 @@ class HangarScreen extends StatelessWidget {
             style: textTheme.bodyMedium,
           ),
           const SizedBox(height: 12),
-          buildBaysGrid(),
+          buildBaysGridView(),
         ],
       ),
     );
   }
 
-  Expanded buildBaysGrid() {
+  Expanded buildBaysGridView() {
     return Expanded(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -88,7 +86,7 @@ class HangarScreen extends StatelessWidget {
           color: assignedDrone == null
               ? Colors.grey.shade300
               : Colors.blue.shade200,
-          width: 1,
+          width: 1.2,
         ),
       ),
       child: InkWell(

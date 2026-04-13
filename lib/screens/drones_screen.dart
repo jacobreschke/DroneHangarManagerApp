@@ -6,7 +6,7 @@ import '../models/drone.dart';
 
 enum DronesScreenState { viewDrones, addDrone, editDrone }
 
-AppData appData = new AppData();
+final AppData appData = AppData();
 
 List<Drone> filteredDrones = appData.drones;
 
@@ -24,11 +24,6 @@ class _DronesScreenState extends State<DronesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    appData.drones[0].status = Status.available;
-    appData.drones[1].status = Status.flying;
-    appData.drones[2].status = Status.charging;
-    appData.drones[3].status = Status.maintenance;
-
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     return decideScreenState();
@@ -136,7 +131,7 @@ class _DronesScreenState extends State<DronesScreen> {
                 children: [
                   Text(drone.name),
                   Text('${drone.manufacturer} ${drone.model}'),
-                  Text('Bay 1'),
+                  Text('Bay: ${drone.currentBay}'),
                 ],
               ),
             ),

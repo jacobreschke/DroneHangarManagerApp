@@ -4,7 +4,13 @@ import 'package:drone_hangar_manager/screens/hangar_screen.dart';
 import 'package:drone_hangar_manager/screens/logs_screen.dart';
 import 'package:flutter/material.dart';
 
+import 'AppData.dart';
+
+AppData appData = AppData();
+
+
 void main() {
+
   runApp(const HangarApp());
 }
 
@@ -13,6 +19,9 @@ class HangarApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+
+
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomePage(),
