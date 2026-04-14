@@ -224,18 +224,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: EdgeInsets.symmetric(horizontal: pagePadding),
       child: Container(
         decoration: BoxDecoration(
-          color: isAlertsExpanded
-              ? Colors.orange.withOpacity(backgroundOpacity) // calm when open
-              : hasCritical
-              ? Colors.red.withOpacity(.35)
+          color: hasCritical
+              ? Colors.red.withOpacity(isAlertsExpanded ? 0.20 : 0.55)
               : Colors.orange.withOpacity(backgroundOpacity),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             width: 1.2,
-            color: isAlertsExpanded
-                ? Colors.orange.withOpacity(borderOpacity)
-                : hasCritical
-                ? Colors.red.withOpacity(borderOpacity)
+            color: hasCritical
+                ? Colors.red.withOpacity(isAlertsExpanded ? 0.35 : borderOpacity)
                 : Colors.orange.withOpacity(borderOpacity),
           ),
         ),
@@ -254,11 +250,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             childrenPadding: const EdgeInsets.only(bottom: 8),
             leading: Icon(
               Icons.warning_amber_rounded,
-              color: isAlertsExpanded
-                  ? Colors.orange
-                  : hasCritical
-                  ? Colors.red
-                  : Colors.orange,
+              color: hasCritical ? Colors.red : Colors.orange,
             ),
             title: const Text(
               'Alerts',
