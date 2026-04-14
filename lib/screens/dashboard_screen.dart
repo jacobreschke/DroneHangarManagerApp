@@ -9,6 +9,7 @@ final AppData appData = AppData();
 
 double borderOpacity = .45;
 double backgroundOpacity = .1;
+double pagePadding = 8;
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,14 +18,19 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-
 class _DashboardScreenState extends State<DashboardScreen> {
   bool isAlertsExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(children: [buildGridView(), buildAlertsBox(context)]),
+      child: Column(
+        children: [
+          buildGridView(),
+          buildAlertsBox(context),
+          buildCurrentFlightsBox(),
+        ],
+      ),
     );
   }
 
@@ -32,13 +38,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final droneStatuses = getDroneStatuses();
 
     return Padding(
-      padding: EdgeInsets.all(12.0),
+      padding: EdgeInsets.all(pagePadding),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.maxWidth;
 
           final crossAxisCount = width < 500 ? 2 : 3;
-          final aspectRatio = crossAxisCount == 2 ? 1.2 : 1.0;
+          final aspectRatio = crossAxisCount == 2 ? 1.3 : 1.1;
 
           return GridView.builder(
             shrinkWrap: true,
@@ -147,7 +153,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           'color': Colors.red,
         });
       }
-
     }
 
     alerts.sort((a, b) => a['priority'].compareTo(b['priority']));
@@ -216,7 +221,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final hasCritical = alerts.any((a) => a['priority'] == 0);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      padding: EdgeInsets.symmetric(horizontal: pagePadding),
       child: Container(
         decoration: BoxDecoration(
           color: isAlertsExpanded
@@ -226,6 +231,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               : Colors.orange.withOpacity(backgroundOpacity),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
+            width: 1.2,
             color: isAlertsExpanded
                 ? Colors.orange.withOpacity(borderOpacity)
                 : hasCritical
@@ -234,14 +240,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         child: Theme(
-          data: Theme.of(context).copyWith(dividerColor: Colors.transparent,),
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(
             onExpansionChanged: (expanded) {
               setState(() {
                 isAlertsExpanded = expanded;
               });
             },
-            tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
             childrenPadding: const EdgeInsets.only(bottom: 8),
             leading: Icon(
               Icons.warning_amber_rounded,
@@ -276,7 +285,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  List<Drone> getFlyingDrones() {
+    return appData.drones
+        .where((drone) => drone.status == Status.flying)
+        .toList();
+  }
 
+  Widget buildCurrentFlightsBox() {
+    final flyingDrones = getFlyingDrones();
+
+    return Padding(
+      padding: EdgeInsets.all(pagePadding),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey,
+          width: 1.2),
+        ),
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            leading: Icon(Icons.flight),
+            title: Text(
+              'Current Flights',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text('${flyingDrones.length} active'),
+            children: flyingDrones.isEmpty
+                ? [
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text('No drones currently flying'),
+                    ),
+                  ]
+                : flyingDrones.map((drone) {
+                    return ListTile(
+                      dense: true,
+                      leading: Icon(Icons.flight, color: Colors.blue),
+                      title: Text(drone.name),
+                      subtitle: Text('Battery: ${drone.battery}%'),
+                    );
+                  }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
 }
-
-
