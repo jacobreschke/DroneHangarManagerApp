@@ -200,18 +200,20 @@ class _DronesScreenState extends State<DronesScreen> {
   }
 
   Row buildTitleWithAddButton(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 10.0),
+          padding: const EdgeInsets.all(12),
           child: Text(
             'Current Drones',
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(right: 8.0, top: 4.0),
           child: ElevatedButton.icon(
             onPressed: () {
               setState(() {

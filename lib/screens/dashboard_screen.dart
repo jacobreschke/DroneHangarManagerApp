@@ -9,7 +9,7 @@ final AppData appData = AppData();
 
 double borderOpacity = .45;
 double backgroundOpacity = .1;
-double pagePadding = 8;
+double pagePadding = 12;
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -26,9 +26,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          buildTitle(),
+          buildFleetOverview(),
           buildGridView(),
           buildAlertsBox(context),
-          buildCurrentFlightsBox(),
+          buildCurrentFlightsList(),
+          //buildCurrentFlightsBox(),
         ],
       ),
     );
@@ -39,29 +42,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Padding(
       padding: EdgeInsets.all(pagePadding),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Status', style: TextStyle(fontSize: 18)),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
 
-          final crossAxisCount = width < 500 ? 2 : 3;
-          final aspectRatio = crossAxisCount == 2 ? 1.3 : 1.1;
+              final crossAxisCount = 2;
+              final aspectRatio = 3.2;
 
-          return GridView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(2),
-            itemCount: droneStatuses.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: aspectRatio,
-            ),
-            itemBuilder: (BuildContext context, int index) {
-              return dashboardCard(droneStatuses[index], context);
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                itemCount: droneStatuses.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: aspectRatio,
+                ),
+                itemBuilder: (BuildContext context, int index) {
+                  return dashboardCard(droneStatuses[index], context);
+                },
+              );
             },
-          );
-        },
+          ),
+        ],
       ),
     );
   }
@@ -69,14 +78,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget dashboardCard(Map<String, dynamic> droneStatus, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: (droneStatus['subColor'] as Color).withOpacity(
-          backgroundOpacity,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(.08),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
+        ],
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: (droneStatus['color'] as Color).withOpacity(borderOpacity),
-          width: 1.2,
-        ),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -84,36 +94,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
           print('Dashboard Menu Tapped');
         },
         child: Padding(
-          padding: EdgeInsets.all(25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: EdgeInsets.all(8),
+          child: Row(
             children: [
-              Row(
-                children: [
-                  Icon(
-                    droneStatus['icon'] as IconData,
-                    color: droneStatus['color'] as Color,
-                    size: 20,
-                  ),
-                  SizedBox(width: 3),
-                  Expanded(
-                    child: Text(
-                      '${droneStatus['title']}',
-                      style: TextStyle(
-                        color: (droneStatus['color'] as Color),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
+              Icon(
+                droneStatus['icon'] as IconData,
+                color: droneStatus['color'] as Color,
+                size: 20,
               ),
-              Spacer(),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${droneStatus['title']}',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               Text(
                 '${droneStatus['count']}',
                 style: TextStyle(
-                  color: (droneStatus['color'] as Color),
-                  fontSize: 28,
+                  color: Colors.black,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -168,25 +172,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
             .where((drone) => drone.status == Status.available)
             .length,
         'color': Colors.green,
-        'subColor': Colors.green,
+        'subColor': Colors.white,
         'icon': Icons.check_circle,
       },
-      {
-        'title': 'Flying',
-        'count': appData.drones
-            .where((drone) => drone.status == Status.flying)
-            .length,
-        'color': Color(0xFF3179E1),
-        'subColor': Colors.blue,
-        'icon': Icons.flight,
-      },
+
       {
         'title': 'Charging',
         'count': appData.drones
             .where((drone) => drone.status == Status.charging)
             .length,
         'color': Colors.orange,
-        'subColor': Colors.orange,
+        'subColor': Colors.white,
         'icon': Icons.battery_charging_full,
       },
       {
@@ -195,7 +191,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             .where((drone) => drone.status == Status.maintenance)
             .length,
         'color': Colors.red,
-        'subColor': Colors.red,
+        'subColor': Colors.white,
         'icon': Icons.build,
       },
       {
@@ -204,14 +200,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'color': Colors.purple,
         'subColor': Colors.white,
         'icon': Icons.battery_alert,
-      },
-      {
-        'title': 'Bays Used',
-        'count':
-            '${appData.hangar.bays.where((bay) => bay.assignedDrone != null).length}/${appData.hangar.bays.length}',
-        'color': Colors.deepPurpleAccent,
-        'subColor': Colors.white,
-        'icon': Icons.home,
       },
     ];
   }
@@ -231,7 +219,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           border: Border.all(
             width: 1.2,
             color: hasCritical
-                ? Colors.red.withOpacity(isAlertsExpanded ? 0.35 : borderOpacity)
+                ? Colors.red.withOpacity(
+                    isAlertsExpanded ? 0.35 : borderOpacity,
+                  )
                 : Colors.orange.withOpacity(borderOpacity),
           ),
         ),
@@ -283,45 +273,238 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .toList();
   }
 
-  Widget buildCurrentFlightsBox() {
-    final flyingDrones = getFlyingDrones();
+  Widget buildTitle() {
+    final textTheme = Theme.of(context).textTheme;
 
     return Padding(
-      padding: EdgeInsets.all(pagePadding),
+      padding: EdgeInsets.all(12),
       child: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey,
-          width: 1.2),
-        ),
-        child: Theme(
-          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            leading: Icon(Icons.flight),
-            title: Text(
-              'Current Flights',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dashboard',
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            subtitle: Text('${flyingDrones.length} active'),
-            children: flyingDrones.isEmpty
-                ? [
-                    Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text('No drones currently flying'),
-                    ),
-                  ]
-                : flyingDrones.map((drone) {
-                    return ListTile(
-                      dense: true,
-                      leading: Icon(Icons.flight, color: Colors.blue),
-                      title: Text(drone.name),
-                      subtitle: Text('Battery: ${drone.battery}%'),
-                    );
-                  }).toList(),
-          ),
+            const SizedBox(height: 4),
+          ],
         ),
       ),
     );
+  }
+
+  Widget buildFleetOverview() {
+    final textTheme = Theme.of(context).textTheme;
+
+    final totalDrones = appData.drones.length;
+    final occupiedBays = appData.hangar.bays
+        .where((bay) => bay.assignedDrone != null)
+        .length;
+
+    final flyingDrones = appData.drones
+        .where((drone) => drone.status == Status.flying)
+        .length;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Icon and Fleet Overview
+            Row(
+              children: [
+                Image.asset(
+                  'assets/icons/drone.png',
+                  height: 20,
+                  width: 20,
+                  color: Colors.blue,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Fleet Overview',
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEDEFF5),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  // Left column - total drones
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$totalDrones',
+                          style: textTheme.displayMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text('Total Drones'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 40,
+                    width: 1,
+                    color: Colors.grey.withOpacity(0.3),
+                  ),
+                  const SizedBox(width: 16),
+                  // Right column - flying and bays used
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.flight,
+                              size: 16,
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(width: 6),
+                            Text('$flyingDrones Flying'),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.home,
+                              size: 16,
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '$occupiedBays/${appData.hangar.bays.length} Bays Used',
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget buildCurrentFlightsList() {
+    final textTheme = Theme.of(context).textTheme;
+    final flyingDrones = getFlyingDrones();
+
+    return Padding(
+      padding: EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            child: Text('Current Flights', style: textTheme.titleMedium),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.05),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
+                  if (flyingDrones.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text('No drones currently flying'),
+                    )
+                  else
+                    ...flyingDrones.map((drone) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.flight, color: Colors.blue),
+                          title: Text(drone.name),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                getBatteryIcon(drone.battery),
+                                size: 16,
+                                color: getBatteryColor(drone.battery),
+                              ),
+                              SizedBox(width: 4,),
+                              Text(
+                                  '${drone.battery}%',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18
+                                ),
+                              ),
+                            ],
+                          ),
+
+                        ),
+                      );
+                    }).toList(),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color? getBatteryColor(int battery) {
+    if (battery >= 70) { return Colors.green; }
+    else if (battery >= 30) { return Colors.orange; }
+    else { return Colors.red; }
+  }
+
+  IconData? getBatteryIcon(int battery) {
+    if (battery >= 90) { return Icons.battery_full; }
+    if (battery >= 60) { return Icons.battery_6_bar; }
+    if (battery >= 30) { return Icons.battery_3_bar; }
+    if (battery >= 10) { return Icons.battery_1_bar; }
+    else { return Icons.battery_alert; }
   }
 }
